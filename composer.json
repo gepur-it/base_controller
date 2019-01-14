@@ -1,0 +1,33 @@
+{
+    "name": "gepur-it/base_controller",
+    "description": "Gepur base controller",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Andrii Yakovlev",
+            "email": "yawa20@gmail.com"
+        },
+        {
+            "name": "Marina Mileva",
+            "email": "m934222258@gmail.com"
+        },
+        {
+            "name": "Victor Pavlov",
+            "email": "zogxray@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "GepurIt\\BaseController\\": "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.2",
+        "friendsofsymfony/rest-bundle": "^2.5",
+        "symfony/validator": "^4.2"
+    }
+}
