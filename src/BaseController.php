@@ -6,41 +6,41 @@
 
 namespace GepurIt\BaseController;
 
-use FOS\RestBundle\Controller\AbstractFOSRestController;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Class BaseController
  */
-class BaseController extends AbstractFOSRestController
+class BaseController extends AbstractController
 {
     const DEFAULT_TEMPLATE = 'base.html.twig';
 
     /**
      * @param ConstraintViolationListInterface $errors
-     * @param string                           $template
      *
      * @return Response
      */
     public function getErrorsResponse(
-        ConstraintViolationListInterface $errors,
-        $template = self::DEFAULT_TEMPLATE
+        ConstraintViolationListInterface $errors
     ): Response {
-        return $this->handleView($this->view($errors)->setTemplate($template)->setStatusCode(400));
+        $errors = $this->get('jms_serializer')->serialize($errors, 'json');
+
+        return new Response($errors, 400, ['content-type' => 'application/json']);
     }
 
     /**
-     * @param array  $errors is array of custom errors
-     * @param int    $status
-     * @param string $template
+     * @param array $errors is array of custom errors
+     * @param int   $status
      *
      * @return Response
      */
     public function getCustomErrorsResponse(
         array $errors,
-        $status = 400,
-        $template = self::DEFAULT_TEMPLATE
+        $status = 400
     ): Response {
         $formattedErrors = [];
 
@@ -48,7 +48,7 @@ class BaseController extends AbstractFOSRestController
             $formattedErrors[] = ['field' => $field, 'message' => $message];
         }
 
-        return $this->handleView($this->view($formattedErrors)->setTemplate($template)->setStatusCode($status));
+        return new Response($formattedErrors, $status, ['content-type' => 'application/json']);
     }
 
     /**
@@ -73,12 +73,14 @@ class BaseController extends AbstractFOSRestController
      */
     public function simpleView($data, array $serializationGroups = null)
     {
-        $view = $this->view($data)->setTemplate(self::DEFAULT_TEMPLATE);
+        $context = new SerializationContext();
         if (null !== $serializationGroups) {
-            $view->getContext()->setGroups($serializationGroups);
+            $context->setGroups($serializationGroups);
         }
 
-        return $this->handleView($view);
+        $data = $this->get('jms_serializer')->serialize($data, 'json', $context);
+
+        return new Response($data, Response::HTTP_OK, ['content-type' => 'application/json']);
     }
 
     /**
@@ -114,8 +116,16 @@ class BaseController extends AbstractFOSRestController
      */
     public function emptyView()
     {
-        $view = $this->view(null, 204)->setTemplate(self::DEFAULT_TEMPLATE);
+        return new Response('',Response::HTTP_NO_CONTENT);
+    }
 
-        return $this->handleView($view);
+    /**
+     * @return array
+     */
+    public static function getSubscribedServices()
+    {
+        $base  = parent::getSubscribedServices();
+        $base['jms_serializer'] = '?'.SerializerInterface::class;
+        return $base;
     }
 }
