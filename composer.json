@@ -3,7 +3,7 @@
     "description": "Gepur base controller",
     "type": "symfony-bundle",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "authors": [
         {
             "name": "Andrii Yakovlev",

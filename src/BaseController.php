@@ -9,6 +9,7 @@ namespace GepurIt\BaseController;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -29,7 +30,7 @@ class BaseController extends AbstractController
     ): Response {
         $errors = $this->get('jms_serializer')->serialize($errors, 'json');
 
-        return new Response($errors, 400, ['content-type' => 'application/json']);
+        return new JsonResponse($errors, 400, ['Content-type' => 'application/json'], true);
     }
 
     /**
@@ -48,7 +49,7 @@ class BaseController extends AbstractController
             $formattedErrors[] = ['field' => $field, 'message' => $message];
         }
 
-        return new Response($formattedErrors, $status, ['content-type' => 'application/json']);
+        return new JsonResponse($formattedErrors, $status, ['Content-type' => 'application/json'], true);
     }
 
     /**
@@ -59,7 +60,7 @@ class BaseController extends AbstractController
      */
     public function getCustomResponse(int $code, string $message = null)
     {
-        $response = new Response();
+        $response = new JsonResponse(null, JsonResponse::HTTP_OK, ['Content-type' => 'application/json']);
         $response->setStatusCode($code, $message);
 
         return $response;
@@ -80,7 +81,7 @@ class BaseController extends AbstractController
 
         $data = $this->get('jms_serializer')->serialize($data, 'json', $context);
 
-        return new Response($data, Response::HTTP_OK, ['content-type' => 'application/json']);
+        return new JsonResponse($data, JsonResponse::HTTP_OK, ['Content-type' => 'application/json'], true);
     }
 
     /**
@@ -90,10 +91,11 @@ class BaseController extends AbstractController
      */
     public function lightView($data)
     {
-        return new Response(
-            json_encode($data),
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
+        return new JsonResponse(
+            $data,
+            JsonResponse::HTTP_OK,
+            ['Content-type' => 'application/json'],
+            false
         );
     }
 
@@ -104,10 +106,11 @@ class BaseController extends AbstractController
      */
     public function rawJsonView(string $data)
     {
-        return new Response(
+        return new JsonResponse(
             $data,
-            Response::HTTP_OK,
-            ['content-type' => 'application/json']
+            JsonResponse::HTTP_OK,
+            ['Content-type' => 'application/json'],
+            true
         );
     }
 
@@ -116,7 +119,7 @@ class BaseController extends AbstractController
      */
     public function emptyView()
     {
-        return new Response('',Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null,JsonResponse::HTTP_NO_CONTENT, ['Content-type' => 'application/json']);
     }
 
     /**
