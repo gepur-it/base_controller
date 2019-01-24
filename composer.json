@@ -3,7 +3,7 @@
     "description": "Gepur base controller",
     "type": "symfony-bundle",
     "license": "MIT",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "authors": [
         {
             "name": "Andrii Yakovlev",
@@ -30,6 +30,7 @@
         "symfony/validator": "^4.2",
         "jms/serializer": ">=1.10",
         "symfony/http-foundation": "^4.2",
-        "symfony/framework-bundle": "^4.2"
+        "symfony/framework-bundle": "^4.2",
+        "symfony/serializer": "^4.2"
     }
 }

@@ -11,6 +11,7 @@ use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -28,9 +29,17 @@ class BaseController extends AbstractController
     public function getErrorsResponse(
         ConstraintViolationListInterface $errors
     ): Response {
-        $errors = $this->get('jms_serializer')->serialize($errors, 'json');
+        $resultErrors = [];
+        /** @var ConstraintViolationInterface $error */
+        foreach ($errors as $error)
+        {
+            $resultErrors[] = [
+                'field'   => $error->getPropertyPath(),
+                'message' => $error->getMessage(),
+            ];
+        }
 
-        return new JsonResponse($errors, 400, ['Content-type' => 'application/json'], true);
+        return new JsonResponse($resultErrors, 400, ['Content-type' => 'application/json']);
     }
 
     /**
@@ -49,7 +58,7 @@ class BaseController extends AbstractController
             $formattedErrors[] = ['field' => $field, 'message' => $message];
         }
 
-        return new JsonResponse($formattedErrors, $status, ['Content-type' => 'application/json'], true);
+        return new JsonResponse($formattedErrors, $status, ['Content-type' => 'application/json']);
     }
 
     /**
